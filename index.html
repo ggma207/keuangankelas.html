@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KasKelas - Sistem Keuangan Kelas Digital</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-hover: #1e40af;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #cbd5e1;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Halaman Login */
+        #login-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        /* Halaman Dashboard */
+        #app-section {
+            display: none;
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Ringkasan Saldo */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--primary);
+        }
+
+        .summary-card.masuk { border-top-color: var(--success); }
+        .summary-card.keluar { border-top-color: var(--danger); }
+
+        .summary-card small {
+            color: #64748b;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .summary-card .amount {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        /* Card & Tabs */
+        .card {
+            background-color: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+            color: var(--primary);
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        button.btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        button.btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Tabel Data */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .badge-masuk { background-color: #dcfce7; color: #15803d; }
+        .badge-keluar { background-color: #fee2e2; color: #b91c1c; }
+
+        /* Checklist Iuran */
+        .iuran-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .iuran-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 1. HALAMAN LOGIN -->
+        <div id="login-section">
+            <div class="login-card">
+                <div class="login-logo">KK</div>
+                <h2>KasKelas</h2>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Pencatatan Keuangan Kas Kelas XI-A</p>
+                
+                <div class="form-group" style="text-align: left;">
+                    <label>Nama Pengguna / Peran:</label>
+                    <select id="login-peran">
+                        <option value="Bendahara">Bendahara (Akses Penuh)</option>
+                        <option value="Sekretaris">Sekretaris</option>
+                        <option value="Wali Kelas">Wali Kelas (Hanya Lihat)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label>PIN Masuk:</label>
+                    <input type="password" id="login-pin" placeholder="Default: 123456">
+                </div>
+                <button class="btn-primary" onclick="login()">MASUK</button>
+            </div>
+        </div>
+
+        <!-- 2. DASHBOARD UTAMA -->
+        <div id="app-section">
+            <div class="header">
+                <div>
+                    <h1>KasKelas Digital</h1>
+                    <small id="user-role-text" style="opacity: 0.9;"></small>
+                </div>
+                <button class="logout-btn" onclick="logout()">Keluar</button>
+            </div>
+
+            <!-- Ringkasan Saldo -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <small>Total Saldo Kas</small>
+                    <div class="amount" id="saldo-total">Rp 0</div>
+                </div>
+                <div class="summary-card masuk">
+                    <small>Pemasukan Bulan Ini</small>
+                    <div class="amount" id="total-masuk" style="color: var(--success);">Rp 0</div>
+                </div>
+                <div class="summary-card keluar">
+                    <small>Pengeluaran Bulan Ini</small>
+                    <div class="amount" id="total-keluar" style="color: var(--danger);">Rp 0</div>
+                </div>
+            </div>
+
+            <!-- Form Transaksi Baru -->
+            <div class="card" id="form-transaksi-card">
+                <h2>Catat Transaksi Kas</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>Jenis Transaksi:</label>
+                        <select id="t-jenis" onchange="toggleNotaField()">
+                            <option value="masuk">Pemasukan (+)</option>
+                            <option value="keluar">Pengeluaran (-)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal:</label>
+                        <input type="date" id="t-tanggal">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group">
+                        <label>Nominal (Rp):</label>
+                        <input type="number" id="t-nominal" placeholder="Contoh: 20000" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori:</label>
+                        <select id="t-kategori">
+                            <option value="Iuran">Iuran Siswa</option>
+                            <option value="Perlengkapan">Perlengkapan Kelas</option>
+                            <option value="Denda">Denda Terlambat</option>
+                            <option value="Lainnya">Lain-lain</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Keterangan Transaksi:</label>
+                    <input type="text" id="t-ket" placeholder="Contoh: Beli spidol papan tulis">
+                </div>
+                <div class="form-group" id="nota-group" style="display: none;">
+                    <label>Foto Nota / Bukti Pembelian (Wajib Pengeluaran):</label>
+                    <input type="file" id="t-nota" accept="image/*">
+                </div>
+                <button class="btn-primary" onclick="simpanTransaksi()">Simpan Transaksi</button>
+            </div>
+
+            <!-- Checklist Iuran Siswa -->
+            <div class="card">
+                <h2>Catat Iuran Mingguan Siswa</h2>
+                <div class="form-group">
+                    <label>Periode Iuran:</label>
+                    <select id="iuran-periode" onchange="renderIuranChecklist()">
+                        <option value="Oktober-M1">Oktober - Minggu 1</option>
+                        <option value="Oktober-M2">Oktober - Minggu 2</option>
+                        <option value="Oktober-M3">Oktober - Minggu 3</option>
+                        <option value="Oktober-M4">Oktober - Minggu 4</option>
+                    </select>
+                </div>
+                <label>Daftar Siswa (Centang yang sudah bayar Rp 5.000):</label>
+                <div id="iuran-checklist" class="iuran-grid"></div>
+                <p id="tunggakan-info" style="font-size: 0.85rem; color: var(--danger); font-weight: bold; margin-top: 10px;"></p>
+            </div>
+
+            <!-- Tabel Riwayat Transaksi -->
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h2 style="margin: 0; border: none;">Riwayat Transaksi</h2>
+                    <button style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;" onclick="eksporCSV()">Ekspor CSV (Excel)</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Keterangan</th>
+                            <th>Jenis</th>
+                            <th>Nominal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabel-transaksi"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Siswa XI-A (30 Siswa)
+        const daftarSiswa = [
+            "Andi", "Budi", "Citra", "Dewi", "Eka", "Fajar", "Galih", "Hana", 
+            "Indra", "Joko", "Kartika", "Lestari", "Mita", "Nadia", "Oky", 
+            "Putri", "Qori", "Reza", "Siska", "Taufik", "Umar", "Vina", 
+            "Wulan", "Xena", "Yusuf", "Zahra", "Arka", "Bagus", "Clara", "Diva"
+        ];
+
+        // State Aplikasi (In-Memory Database)
+        let currentUserRole = '';
+        let database = {
+            transaksi: [
+                { id: 1, tanggal: "2026-10-01", jenis: "masuk", kategori: "Iuran", nominal: 60000, keterangan: "Iuran M1 (12 Siswa)", status: "aktif" },
+                { id: 2, tanggal: "2026-10-03", jenis: "keluar", kategori: "Perlengkapan", nominal: 20000, keterangan: "Beli spidol papan tulis", status: "aktif" }
+            ],
+            iuran: {
+                "Oktober-M1": ["Andi", "Budi", "Citra", "Dewi", "Eka", "Fajar", "Galih", "Hana", "Indra", "Joko", "Kartika", "Lestari"]
+            }
+        };
+
+        // Inisialisasi Tanggal Hari Ini
+        document.getElementById('t-tanggal').valueAsDate = new Date();
+
+        function login() {
+            const pin = document.getElementById('login-pin').value;
+            const peran = document.getElementById('login-peran').value;
+
+            // Validasi PIN Sederhana
+            if (pin !== '123456' && pin !== '') {
+                alert("PIN salah! (Gunakan PIN default: 123456)");
+                return;
+            }
+
+            currentUserRole = peran;
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('app-section').style.display = 'block';
+            document.getElementById('user-role-text').innerText = `Masuk sebagai: ${peran}`;
+
+            // Pembatasan Hak Akses (Wali Kelas hanya membaca)
+            if (peran === 'Wali Kelas') {
+                document.getElementById('form-transaksi-card').style.display = 'none';
+            } else {
+                document.getElementById('form-transaksi-card').style.display = 'block';
+            }
+
+            refreshUI();
+        }
+
+        function logout() {
+            document.getElementById('login-section').style.display = 'flex';
+            document.getElementById('app-section').style.display = 'none';
+        }
+
+        function toggleNotaField() {
+            const jenis = document.getElementById('t-jenis').value;
+            const notaGroup = document.getElementById('nota-group');
+            notaGroup.style.display = jenis === 'keluar' ? 'block' : 'none';
+        }
+
+        function formatRupiah(angka) {
+            return "Rp " + angka.toLocaleString('id-ID');
+        }
+
+        function refreshUI() {
+            renderSummary();
+            renderTabelTransaksi();
+            renderIuranChecklist();
+        }
+
+        function renderSummary() {
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+
+            database.transaksi.forEach(t => {
+                if (t.status === 'aktif') {
+                    if (t.jenis === 'masuk') totalMasuk += t.nominal;
+                    if (t.jenis === 'keluar') totalKeluar += t.nominal;
+                }
+            });
+
+            const saldo = totalMasuk - totalKeluar;
+            document.getElementById('saldo-total').innerText = formatRupiah(saldo);
+            document.getElementById('total-masuk').innerText = formatRupiah(totalMasuk);
+            document.getElementById('total-keluar').innerText = formatRupiah(totalKeluar);
+        }
+
+        function renderTabelTransaksi() {
+            const tbody = document.getElementById('tabel-transaksi');
+            tbody.innerHTML = '';
+
+            database.transaksi.forEach(t => {
+                if (t.status === 'batal') return;
+
+                const badgeClass = t.jenis === 'masuk' ? 'badge-masuk' : 'badge-keluar';
+                const aksiBtn = currentUserRole !== 'Wali Kelas' 
+                    ? `<button style="background: var(--danger); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;" onclick="batalkanTransaksi(${t.id})">Batal</button>`
+                    : '-';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${t.tanggal}</td>
+                        <td>${t.keterangan}</td>
+                        <td><span class="badge ${badgeClass}">${t.jenis.toUpperCase()}</span></td>
+                        <td>${formatRupiah(t.nominal)}</td>
+                        <td>${aksiBtn}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function simpanTransaksi() {
+            const jenis = document.getElementById('t-jenis').value;
+            const tanggal = document.getElementById('t-tanggal').value;
+            const nominal = parseInt(document.getElementById('t-nominal').value);
+            const kategori = document.getElementById('t-kategori').value;
+            const ket = document.getElementById('t-ket').value.trim();
+            const notaFile = document.getElementById('t-nota').files[0];
+
+            // Validasi Input
+            if (!nominal || nominal <= 0) {
+                alert("Nominal harus berupa angka bulat lebih dari 0!");
+                return;
+            }
+            if (!ket) {
+                alert("Keterangan transaksi wajib diisi!");
+                return;
+            }
+            if (jenis === 'keluar' && !notaFile) {
+                alert("Pengeluaran WAJIB mengunggah foto bukti nota!");
+                return;
+            }
+
+            // Deteksi Transaksi Ganda (Risk Prevention)
+            const isDuplicate = database.transaksi.some(t => 
+                t.status === 'aktif' && t.tanggal === tanggal && t.nominal === nominal && t.keterangan.toLowerCase() === ket.toLowerCase()
+            );
+
+            if (isDuplicate) {
+                if (!confirm("Transaksi serupa sudah pernah dicatat! Tetap simpan?")) return;
+            }
+
+            database.transaksi.unshift({
+                id: Date.now(),
+                tanggal,
+                jenis,
+                kategori,
+                nominal,
+                keterangan: ket,
+                status: 'aktif'
+            });
+
+            // Reset Form
+            document.getElementById('t-nominal').value = '';
+            document.getElementById('t-ket').value = '';
+            document.getElementById('t-nota').value = '';
+
+            alert("Transaksi berhasil disimpan!");
+            refreshUI();
+        }
+
+        function batalkanTransaksi(id) {
+            const alasan = prompt("Masukkan alasan pembatalan transaksi:");
+            if (!alasan) return;
+
+            const idx = database.transaksi.findIndex(t => t.id === id);
+            if (idx !== -1) {
+                database.transaksi[idx].status = 'batal';
+                alert("Transaksi berhasil dibatalkan dan tercatat pada Log Audit.");
+                refreshUI();
+            }
+        }
+
+        function renderIuranChecklist() {
+            const periode = document.getElementById('iuran-periode').value;
+            const container = document.getElementById('iuran-checklist');
+            container.innerHTML = '';
+
+            if (!database.iuran[periode]) {
+                database.iuran[periode] = [];
+            }
+
+            const sudahBayar = database.iuran[periode];
+            let belumBayarList = [];
+
+            daftarSiswa.forEach(siswa => {
+                const isChecked = sudahBayar.includes(siswa);
+                if (!isChecked) belumBayarList.push(siswa);
+
+                container.innerHTML += `
+                    <div class="iuran-item">
+                        <input type="checkbox" id="s-${siswa}" ${isChecked ? 'checked' : ''} ${currentUserRole === 'Wali Kelas' ? 'disabled' : ''} onchange="toggleIuranSiswa('${siswa}', '${periode}')">
+                        <label for="s-${siswa}" style="margin: 0; font-weight: normal; cursor: pointer;">${siswa}</label>
+                    </div>
+                `;
+            });
+
+            document.getElementById('tunggakan-info').innerText = 
+                `Belum Bayar (${belumBayarList.length} siswa): ${belumBayarList.join(', ') || 'Semua Lunas'}`;
+        }
+
+        function toggleIuranSiswa(nama, periode) {
+            const idx = database.iuran[periode].indexOf(nama);
+            if (idx === -1) {
+                database.iuran[periode].push(nama);
+                // Tambah Transaksi Otomatis
+                database.transaksi.unshift({
+                    id: Date.now(),
+                    tanggal: new Date().toISOString().split('T')[0],
+                    jenis: 'masuk',
+                    kategori: 'Iuran',
+                    nominal: 5000,
+                    keterangan: `Iuran ${periode} (${nama})`,
+                    status: 'aktif'
+                });
+            } else {
+                database.iuran[periode].splice(idx, 1);
+            }
+            refreshUI();
+        }
+
+        function eksporCSV() {
+            let csv = "Tanggal,Keterangan,Jenis,Nominal\n";
+            database.transaksi.forEach(t => {
+                if (t.status === 'aktif') {
+                    csv += `"${t.tanggal}","${t.keterangan}","${t.jenis}",${t.nominal}\n`;
+                }
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'Laporan_Kas_Kelas.csv');
+            a.click();
+        }
+    </script>
+</body>
+</html>
